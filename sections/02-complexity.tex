@@ -1,0 +1,147 @@
+\sectionquestion{What makes code complex?}
+\section[Complexity]{Complexity}
+
+\begin{frame}{What makes code hard to work with?}
+    \source{ousterhout2018philosophy}
+
+    \begin{center}
+    \large\textbf{\textcolor{talkaccent}{Complexity}}: anything that makes code hard to
+    understand or change
+    \end{center}
+
+    \vfill
+
+    \begin{columns}[T]
+        \column{0.32\textwidth}
+        \centering
+        \onslide<2->
+        % Working memory holds about four names; the rest spill out
+        \begin{tikzpicture}[
+            var/.style={font=\tiny\ttfamily, fill=codebg, draw=talkblue, text=talkfg, inner sep=1.5pt},
+            spill/.style={var, draw=talkbad, text=talkbad}]
+            \useasboundingbox (-0.1,-0.45) rectangle (3.4,1.6);
+            \draw[talkdim, rounded corners] (0,0) rectangle (2.4,1.1);
+            \node[font=\tiny, text=talkdim] at (1.2,-0.25) {your working memory};
+            \node[var] at (0.6,0.8) {mode};
+            \node[var] at (1.7,0.8) {scale};
+            \node[var] at (0.6,0.3) {offset};
+            \node[var] at (1.7,0.3) {done};
+            \node[spill] at (2.0,1.4) {threshold};
+            \node[spill] at (2.8,0.85) {k};
+            \node[spill] at (2.9,0.3) {use\_bg};
+        \end{tikzpicture}\par
+        \vspace{0.6em}
+        {\large\bfseries\textcolor{talkaccent}{Cognitive load}}\par
+        \vspace{0.3em}
+        {\small\textcolor{talkdim}{Too much to keep in mind at once}}
+
+        \column{0.32\textwidth}
+        \centering
+        \onslide<3->
+        % One value changes: every file that copied it needs an edit
+        \begin{tikzpicture}[
+            file/.style={font=\tiny\ttfamily, fill=codebg, draw=talkblue, text=talkfg, inner sep=2pt}]
+            \useasboundingbox (-0.1,-0.45) rectangle (3.4,1.6);
+            \node[font=\scriptsize\ttfamily, draw=talkbad, text=talkbad, inner sep=2pt] (c)
+                at (0.45,0.55) {g = 9.81};
+            \node[file] (f1) at (2.6,1.25) {forces.py};
+            \node[file] (f2) at (2.6,0.55) {energy.py};
+            \node[file] (f3) at (2.6,-0.15) {plots.py};
+            \foreach \f in {f1, f2, f3}
+                \draw[->, talkbad] (c.east) -- (\f.west);
+        \end{tikzpicture}\par
+        \vspace{0.6em}
+        {\large\bfseries\textcolor{talkaccent}{Change amplification}}\par
+        \vspace{0.3em}
+        {\small\textcolor{talkdim}{One change, edits everywhere}}
+
+        \column{0.32\textwidth}
+        \centering
+        \onslide<4->
+        % Parts you can see, and one you don't know exists
+        \begin{tikzpicture}
+            \useasboundingbox (-0.1,-0.45) rectangle (3.4,1.6);
+            \foreach \i in {0,1,2} \foreach \j in {0,1}
+                \draw[talkblue, thick] ({0.2+\i*0.65},{0.05+\j*0.6}) rectangle ++(0.45,0.4);
+            \draw[talkbad, thick, dashed] (2.15,0.35) rectangle ++(0.45,0.4);
+            \node[text=talkbad, font=\bfseries] at (2.375,0.55) {?};
+        \end{tikzpicture}\par
+        \vspace{0.6em}
+        {\large\bfseries\textcolor{talkaccent}{Unknown unknowns}}\par
+        \vspace{0.3em}
+        {\small\textcolor{talkdim}{You don't know what you need to know}}
+    \end{columns}
+    \onslide
+
+    \vfill
+
+\end{frame}
+
+
+
+
+\begin{frame}{Where does complexity come from?}
+
+    \vfill
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \centering
+        % One function quietly relies on four things outside it
+        \begin{tikzpicture}[
+            dep/.style={font=\tiny, fill=codebg, draw=talkbad, text=talkfg,
+                        inner sep=2pt, align=center}]
+            \useasboundingbox (-2.6,-1.3) rectangle (2.6,1.3);
+            \node[font=\scriptsize\ttfamily, fill=codebg, draw=talkblue, thick,
+                  text=talkfg, inner sep=3pt] (f) at (0,0) {analyse()};
+            \node[dep] (a) at (-1.7,0.9) {global variables};
+            \node[dep] (b) at (1.7,0.9) {file format};
+            \node[dep] (c) at (-1.7,-0.9) {call \texttt{load()} first};
+            \node[dep] (d) at (1.7,-0.9) {another object's data};
+            \foreach \n in {a, b, c, d}
+                \draw[->, talkbad] (f) -- (\n);
+        \end{tikzpicture}\par
+        \vspace{0.6em}
+        {\large\bfseries\textcolor{talkaccent}{Dependencies}}\par
+        \vspace{0.3em}
+        {\small\textcolor{talkdim}{Code you can't understand on its own}}
+
+        \column{0.48\textwidth}
+        \centering
+        \onslide<2->
+        % One line, three names that hide their meaning
+        \begin{tikzpicture}[
+            tok/.style={font=\scriptsize\ttfamily, text=talkfg, inner sep=1pt},
+            hid/.style={tok, text=talkbad},
+            q/.style={font=\small\bfseries, text=talkbad},
+            why/.style={font=\tiny, text=talkdim}]
+            \useasboundingbox (-2.6,-1.3) rectangle (2.6,1.3);
+            \node[tok, anchor=west] (t1) at (-1.9,0) {r =};
+            \node[hid, right=6pt of t1] (t2) {data};
+            \node[tok, right=6pt of t2] (t3) {*};
+            \node[hid, right=6pt of t3] (t4) {0.0259};
+            \node[tok, right=6pt of t4] (t5) {+};
+            \node[hid, right=6pt of t5] (t6) {tmp};
+            \foreach \t in {t2, t4, t6}
+                \node[q, above=3pt of \t] {?};
+            \node[why, below=4pt of t2] {vague name};
+            \node[why, below=16pt of t4] {magic number};
+            \node[why, below=4pt of t6] {unclear name};
+        \end{tikzpicture}\par
+        \vspace{0.6em}
+        {\large\bfseries\textcolor{talkaccent}{Obscurity}}\par
+        \vspace{0.3em}
+        {\small\textcolor{talkdim}{Information that isn't obvious}}
+    \end{columns}
+    \onslide
+
+    \vfill
+    \onslide<3->
+
+    \takeaway{Everything that follows reduces dependencies or obscurity.}
+
+\end{frame}
+
+
+
+

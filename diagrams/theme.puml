@@ -1,0 +1,70 @@
+' Shared diagram theme. In a diagram: !include theme.puml
+' Light diagram: put  !$dark = %false()  before the include
+!if %not(%variable_exists("$dark"))
+!$dark = %true()
+!endif
+
+!if $dark
+' Catppuccin Mocha (matches \darktheme)
+!$fg = "#CDD6F4"
+!$sub = "#A6ADC8"
+!$box = "#313244"
+!$border = "#89B4FA"
+!$noteBg = "#45475A"
+!$accent = "#F9E2AF"
+!$cls = "#A6E3A1"
+!$ifc = "#CBA6F7"
+!$abs = "#89DCEB"
+!$enm = "#FAB387"
+!$letter = "#1E1E2E"
+!else
+' Catppuccin Latte (matches \lighttheme)
+!$fg = "#4C4F69"
+!$sub = "#6C6F85"
+!$box = "#FFFFFF"
+!$border = "#1E66F5"
+!$noteBg = "#E6E9EF"
+!$accent = "#DF8E1D"
+!$cls = "#40A02B"
+!$ifc = "#8839EF"
+!$abs = "#04A5E5"
+!$enm = "#FE640B"
+!$letter = "#FFFFFF"
+!endif
+
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam roundCorner 6
+skinparam defaultFontColor $fg
+skinparam ArrowColor $fg
+skinparam ArrowThickness 1.3
+skinparam ArrowFontColor $fg
+
+skinparam class {
+  BackgroundColor $box
+  BorderColor $border
+  FontColor $fg
+  AttributeFontColor $fg
+  StereotypeFontColor $sub
+}
+' C / I / A / E circles
+skinparam CircledCharacterFontColor $letter
+skinparam stereotypeCBackgroundColor $cls
+skinparam stereotypeIBackgroundColor $ifc
+skinparam stereotypeABackgroundColor $abs
+skinparam stereotypeEBackgroundColor $enm
+skinparam stereotypeCBorderColor $cls
+skinparam stereotypeIBorderColor $ifc
+skinparam stereotypeABorderColor $abs
+skinparam stereotypeEBorderColor $enm
+
+skinparam note {
+  BackgroundColor $noteBg
+  BorderColor $accent
+  FontColor $fg
+}
+skinparam package {
+  BackgroundColor transparent
+  BorderColor $sub
+  FontColor $fg
+}

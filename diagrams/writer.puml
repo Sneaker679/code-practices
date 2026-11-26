@@ -1,0 +1,29 @@
+@startuml
+' Uncomment for a light diagram:
+' !$dark = %false()
+!include theme.puml
+hide empty members
+
+class Experiment {
+  - writer: Writer
+  + run(data)
+}
+interface Writer {
+  + write(results)
+}
+class CsvWriter {
+  - path
+  + write(results)
+}
+class ConsoleWriter {
+  + write(results)
+}
+class FakeWriter {
+  + write(results)
+}
+
+Experiment --> Writer : has attribute
+Writer <|.. CsvWriter
+Writer <|.. ConsoleWriter
+Writer <|.. FakeWriter
+@enduml

@@ -1,0 +1,265 @@
+\sectionquestion{Who should do what?}
+\section[Design principles]{Software design principles}
+
+\begin{frame}{Why bother with design?}
+    \source{fowler2007stamina}
+
+    \centering
+    \begin{tikzpicture}[
+        note/.style={font=\scriptsize\itshape, text=talkdim, align=left}]
+        % Axes
+        \draw[->, talkdim] (0,0) -- (8.6,0)
+            node[below left, font=\scriptsize, text=talkdim] {time};
+        \draw[->, talkdim] (0,0) -- (0,4.4);
+        \node[rotate=90, anchor=south, font=\scriptsize, text=talkdim] at (0,2.2)
+            {features delivered};
+        % Curves: they cross at (5.2, 2.79)
+        \draw[talkbad, thick] plot[smooth, domain=0:7, samples=40]
+            (\x, {1.25*ln(1+1.6*\x)}) node[right, font=\scriptsize] {no design};
+        \draw[talkgood, thick] plot[smooth, domain=0:6.5, samples=40]
+            (\x, {0.08*\x*\x + 0.12*\x}) node[right, font=\scriptsize] {good design};
+        % Payoff line and the two regions
+        \onslide<2->{
+            \draw[dashed, talkfg] (0,2.79) -- (8.4,2.79);
+            \node[anchor=south west, font=\scriptsize, text=talkfg] at (0.1,2.79)
+                {design payoff line};
+            \node[note, anchor=west] at (0.3,3.7) {above: design always wins};
+            \node[note, anchor=west] at (5.6,1.3) {below: skipping design\\may pay off};
+        }
+    \end{tikzpicture}
+
+    \takeaway{Skipping design is faster, until it isn't.}
+\end{frame}
+
+
+
+
+\begin{frame}{Two goals: low coupling, high cohesion}
+    \source{larman1997applying,martin2000principles}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \textbf{High cohesion}
+        \begin{itemize}
+            \item What is \textit{inside} a class belongs together
+            \item One clear job
+            \item Less to keep in mind (\textit{cognitive load})
+        \end{itemize}
+
+        \column{0.48\textwidth}
+        \textbf{Low coupling}
+        \begin{itemize}
+            \item Classes know little about \textit{each other}
+            \item Few, simple dependencies
+            \item Fewer edits per change (\textit{change amplification})
+        \end{itemize}
+    \end{columns}
+
+    \takeaway{Every principle that follows serves one of these two goals.}
+    \begin{center}
+    \small They come from two families: GRASP and SOLID. We keep the essentials.
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Separate logic from input/output}
+    \framesubtitle{High Cohesion \textperiodcentered{} Single Responsibility}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted[highlightlines={2,4}]{python}{code/design/io_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted[highlightlines={5,7}]{python}{code/design/io_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{Keep calculations free of reading, writing and printing.}
+    \begin{center}
+    Logic you can test without a file; files you can change without touching the logic.
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Put behaviour with its data}
+    \framesubtitle{Information Expert}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted{python}{code/design/behaviour_with_data_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted{python}{code/design/behaviour_with_data_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{If the object holds the data, compute from the object.}
+    \begin{center}
+    The data stays encapsulated in the object.
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Know as little as possible about others}
+    \framesubtitle{Low Coupling}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted{python}{code/design/know_little_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted{python}{code/design/know_little_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{Know as little as possible about other classes.}
+    \begin{center}
+    \texttt{System} doesn't need to know how a planet stores its air.
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{One algorithm, swappable steps}
+    \framesubtitle{Polymorphism \textperiodcentered{} Open/Closed \textperiodcentered{} Strategy pattern}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted[highlightlines={3,8}]{python}{code/design/strategy_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted[highlightlines={1,3}]{python}{code/design/strategy_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{Copies that differ in one step? Make that step an object.}
+    \begin{center}
+    A new integration method is a new class: \texttt{work()} never changes.
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Don't create what you depend on}
+    \framesubtitle{Dependency Inversion \textperiodcentered{} Protected Variations}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted[highlightlines={3}]{python}{code/design/inject_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted[highlightlines={2,3,9,10,11}]{python}{code/design/inject_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{Receive your tools, don't build them, and swap in a fake for tests.}
+    \begin{center}
+    Strategy decides \textit{what} varies; injection decides \textit{who} creates it.
+    \end{center}
+\end{frame}
+
+
+
+
+
+\begin{frame}{One interface, many implementations}
+
+    \diagram[0.65]{diagrams/out/writer/writer.latex}
+
+    \takeaway{\texttt{Experiment} only knows the contract, never a specific writer.}
+    \begin{center}
+    \small Dashed arrow with open triangle: ``implements''. Plain arrow: ``uses''.
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{The same thing in code}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \inputminted[fontsize=\scriptsize]{python}{code/design/writer_interface.py}
+
+        \column{0.48\textwidth}
+        \inputminted[fontsize=\scriptsize, highlightlines={9,10}]{python}{code/design/writer_users.py}
+    \end{columns}
+
+    \vspace{0.8em}
+    \takeaway{The type hint \mintinline{python}{writer: Writer} documents the contract.}
+    \begin{center}
+    \small Editors and type checkers can then flag a writer that breaks it.
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}{The whole picture}
+
+    \diagram[0.7]{diagrams/out/design/design.latex}
+
+    \takeaway{Logic in the middle; everything that varies behind an interface.}
+\end{frame}
+
+
+
+
+\begin{frame}{There is more!}
+
+    \vfill
+
+    \begin{columns}[T]
+        \column{0.32\textwidth}
+        \centering
+        {\Large\bfseries\textcolor{talkaccent}{More principles}}\par
+        \vspace{0.6em}
+        {\small\textcolor{talkdim}{Creator, Controller,\\Liskov Substitution\ldots}}
+
+        \column{0.32\textwidth}
+        \centering
+        {\Large\bfseries\textcolor{talkaccent}{Design patterns}}\par
+        \vspace{0.6em}
+        {\small\textcolor{talkdim}{Proven solutions,\\like Strategy}}
+
+        \column{0.32\textwidth}
+        \centering
+        {\Large\bfseries\textcolor{talkaccent}{Search for}}\par
+        \vspace{0.6em}
+        {\small\textcolor{talkdim}{GRASP \textperiodcentered{} SOLID\\design patterns}}
+    \end{columns}
+
+    \vfill
+    \pause
+
+    \takeaway{Using an AI assistant? Ask it to follow GRASP and SOLID.}
+\end{frame}
+

@@ -1,0 +1,32 @@
+@startuml
+' Uncomment for a light diagram:
+' !$dark = %false()
+!include theme.puml
+hide empty members
+left to right direction
+
+class Experiment {
+  - integrator: Integrator
+  - writer: Writer
+  + run(data)
+}
+interface Integrator {
+  + integrate(y, x)
+}
+interface Writer {
+  + write(results)
+}
+class Trapezoid
+class Simpson
+class CsvWriter
+class ConsoleWriter
+class FakeWriter
+
+Experiment --> Integrator : injected
+Experiment --> Writer : injected
+Integrator <|.. Trapezoid
+Integrator <|.. Simpson
+Writer <|.. CsvWriter
+Writer <|.. ConsoleWriter
+Writer <|.. FakeWriter
+@enduml

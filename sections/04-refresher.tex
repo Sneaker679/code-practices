@@ -1,0 +1,68 @@
+\sectionquestion{What do we need from classes?}
+\section[Refresher]{Refresher of object oriented programming}
+
+\begin{frame}[fragile]{Classes}
+
+    \inputminted{python}{code/refresher/small_refresher_of_classes_and_objects.py}
+
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Inheritance: \textit{is a}}
+
+    \inputminted{python}{code/refresher/inheritance_is_a.py}
+
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Interfaces: \textit{can do}}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \inputminted{python}{code/refresher/interface_contract.py}
+
+        \column{0.48\textwidth}
+        \inputminted{python}{code/refresher/interface_usage.py}
+        \pause
+        \inputminted{python}{code/refresher/interface_broken.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{An interface is a contract: which methods exist, not how they work.}
+    \begin{center}
+    Code that uses \texttt{Force} doesn't care which force it gets.
+    \end{center}
+
+    \vfill
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Inheritance vs Interface}
+
+    Python has no \texttt{interface} keyword. The same syntax means two things:
+
+    \vfill
+    \inputminted{python}{code/refresher/same_syntax.py}
+    \vfill
+
+    \pause
+
+    \texttt{Force} is an interface because it holds \textbf{only promises}:
+    \begin{itemize}
+        \item Abstract methods: signatures, no code
+        \item No attributes: no data
+        \item Any number of classes can sign the same contract
+    \end{itemize}
+
+    \takeaway{Inheritance shares code. An interface only promises behaviour.}
+    \begin{center}
+    \small In this talk, every \texttt{ABC} is used as an interface.
+    \end{center}
+\end{frame}

@@ -1,0 +1,170 @@
+\sectionquestion{What goes wrong?}
+\section[Bad practices]{Bad code practices}
+
+\begin{frame}[fragile,t]{Simple computation}
+
+    % Same line-number style as the folded slide, no jump
+    \foldlines{100000}{1}
+    \begin{center}\begin{minipage}{0.7\linewidth}
+    \inputminted[xleftmargin=3em, numbersep=8pt]{python}{code/bad_practices/example_1.py}
+    \end{minipage}\end{center}
+
+    \cutoff{mmmh...}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Simple... computation?}
+
+    \vfill
+
+    \foldlines{1}{2672}
+    \begin{center}\begin{minipage}{0.7\linewidth}
+    \begin{codewindow}
+    \begin{minted}[xleftmargin=3em, numbersep=8pt]{python}
+    def simple_computation(data): |\fold|
+
+    results = simple_computation(data)
+    \end{minted}
+    \end{codewindow}
+    \end{minipage}\end{center}
+
+    \pause
+
+    \vfill
+
+    \begin{center}
+    Simple... Sure.
+
+    \pause
+
+    \vfill
+
+    \takeaway{Probable issue: \textbf{too many jobs at once}} (we'll name this later)
+    \end{center}
+
+    \vfill
+
+    \begin{columns}[T]
+    \column{0.25\textwidth}
+
+    \begin{itemize}
+        \item Input reading
+        \item Output writing
+        \item etc...
+    \end{itemize}
+
+    \column{0.25\textwidth}
+
+    \begin{itemize}
+        \item Building objects
+        \item Solving
+    \end{itemize}
+    \end{columns}
+
+\end{frame}
+
+
+
+
+\begin{frame}{Toyota unintended acceleration (2013)}
+    \source{srs2013toyota}
+
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{itemize}
+            \item Fatal crash blamed on sudden acceleration
+            \item Experts reviewed the engine software
+            \item ``Spaghetti code'': too complex to test
+            \item \textbf{Jury found Toyota liable}
+        \end{itemize}
+
+        \column{0.46\textwidth}
+        \centering
+        % Every function reads and writes the same global state
+        \begin{tikzpicture}[scale=0.9,
+            fn/.style={draw=talkdim, rounded corners=1pt, fill=codebg, text=talkfg,
+                       font=\tiny\ttfamily, inner sep=2pt},
+            link/.style={<->, talkbad!70!talkbg, line width=0.5pt}]
+            \node[circle, draw=talkbad, thick, fill=talkbad!15!talkbg, text=talkbad,
+                  font=\scriptsize\bfseries, align=center, minimum size=1.2cm] (g)
+                  {global\\state};
+            \foreach \a/\n in {90/brake, 135/fuel, 180/idle, 225/cruise,
+                               270/sensor, 315/logger, 0/timer, 45/throttle}
+                \node[fn] (\n) at (\a:1.6) {\n()};
+            \foreach \n in {brake, fuel, idle, cruise, sensor, logger, timer, throttle}
+                \draw[link] (\n) -- (g);
+            \draw[talkdim] (brake) to[bend left=25] (timer);
+            \draw[talkdim] (idle) to[bend right=25] (sensor);
+            \draw[talkdim] (fuel) to[bend left=40] (logger);
+        \end{tikzpicture}
+
+        \pause
+        \vspace{0.5em}
+        \bigstat{$\sim$10\,000}{global variables}
+    \end{columns}
+
+    \pause
+    \vfill
+
+    \takeaway{When everything can change everything, nothing can be tested.}
+
+\end{frame}
+
+
+
+
+\begin{frame}{Your code will change. Will it let you?}
+    \source{miller2006nightmare}
+
+    \begin{center}
+    \textbf{Who has had to re-run old code for a reviewer?}
+    \end{center}
+
+    \pause
+
+    \begin{columns}[T]
+        \column{0.58\textwidth}
+        \centering
+        % Illustrative sketch, not data
+        \begin{tikzpicture}[
+            dot/.style={circle, fill=talkbad, inner sep=1.6pt},
+            lab/.style={font=\scriptsize, text=talkfg, anchor=east}]
+            \draw[->, talkdim] (0,0) -- (5.6,0)
+                node[below left, font=\scriptsize, text=talkdim] {time since you wrote it};
+            \draw[->, talkdim] (0,0) -- (0,3.4);
+            \node[rotate=90, anchor=south, font=\scriptsize, text=talkdim] at (0,1.7)
+                {effort to change it};
+            \draw[talkgood, thick] (0,0.6) -- (5.3,1.0)
+                node[right, font=\scriptsize] {clean};
+            \draw[talkbad, thick] (0,0.3) .. controls (2.5,0.4) and (4,1.2) .. (5.3,3.1)
+                coordinate[pos=0.45] (m1) coordinate[pos=0.72] (m2) coordinate[pos=0.92] (m3)
+                node[right, font=\scriptsize] {messy};
+            \node[dot] at (m1) {};
+            \node[dot] at (m2) {};
+            \node[dot] at (m3) {};
+            \node[lab] at ([xshift=-4pt, yshift=6pt]m1) {one more figure};
+            \node[lab] at ([xshift=-4pt, yshift=4pt]m2) {reviewer: re-run it};
+            \node[lab] at ([xshift=-4pt, yshift=6pt]m3) {new student};
+            \node[anchor=north west, font=\tiny\itshape, text=talkdim] at (0.1,3.4)
+                {illustrative};
+        \end{tikzpicture}
+
+        \column{0.38\textwidth}
+        \pause
+        \centering
+        \vspace{1em}
+        \bigstat{5}{retracted papers}
+
+        \vspace{0.5em}
+        {\small Geoffrey Chang, 2006: homemade software flipped two columns of
+        data\par}
+    \end{columns}
+
+    \pause
+    \vfill
+
+    \takeaway{Code that is hard to change is code that hides mistakes.}
+
+\end{frame}

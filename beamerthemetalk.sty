@@ -1,0 +1,260 @@
+% beamerthemetalk.sty -- theme for the talk. Usage: \usetheme[dark]{talk} or [light]
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemetalk}
+
+% ---- Mode option ----
+\newif\iftalk@dark \talk@darktrue
+\DeclareOption{dark}{\talk@darktrue}
+\DeclareOption{light}{\talk@darkfalse}
+\ProcessOptions\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[sfdefault]{FiraSans}   % text
+\RequirePackage[scale=0.8]{FiraMono}    % code: same width as the old font
+\RequirePackage{xcolor}
+\RequirePackage[highlightmode=immediate]{minted}   % highlight in one pass (no <MINTED> placeholders)
+\RequirePackage{tikz}
+\RequirePackage{tcolorbox}
+\RequirePackage{adjustbox}   % fit diagrams to the slide
+\RequirePackage{url}         % \path{file_name.dat}: monospace, no escaping
+\RequirePackage{biblatex}     % options are set in main.tex
+\usetikzlibrary{positioning,arrows.meta}
+
+% ---- Palettes ----
+% Per slide: {\lighttheme \begin{frame}...\end{frame}}
+% Re-apply the text colour when switching mid-document
+\newcommand\talk@textcolor{\ifx\@onlypreamble\@notprerr\usebeamercolor[fg]{normal text}\fi}
+\newcommand\darktheme{%
+  % Slides (Catppuccin Mocha)
+  \definecolor{talkbg}{HTML}{1E1E2E}%
+  \definecolor{talkfg}{HTML}{CDD6F4}%
+  \definecolor{talkaccent}{HTML}{F9E2AF}%
+  \definecolor{talkdim}{HTML}{9399B2}%
+  \definecolor{talkgood}{HTML}{A6E3A1}%
+  \definecolor{talkbad}{HTML}{F38BA8}%
+  \definecolor{talkblue}{HTML}{89B4FA}%
+  % Code
+  \setminted{style=one-dark}%
+  \definecolor{codebg}{HTML}{181825}%
+  \definecolor{codehl}{HTML}{45475A}%
+  \talk@textcolor}
+\newcommand\lighttheme{%
+  % Slides (Catppuccin Latte colours on warm paper)
+  \definecolor{talkbg}{HTML}{FAF7F0}%   % warm paper
+  \definecolor{talkfg}{HTML}{4C4F69}%
+  \definecolor{talkaccent}{HTML}{8839EF}%
+  \definecolor{talkdim}{HTML}{6C6F85}%
+  \definecolor{talkgood}{HTML}{2E7D32}%
+  \definecolor{talkbad}{HTML}{D20F39}%
+  \definecolor{talkblue}{HTML}{1E66F5}%
+  % Code
+  \setminted{style=default}%
+  \definecolor{codebg}{HTML}{FFFFFF}%
+  \definecolor{codehl}{HTML}{FFE08A}%
+  \talk@textcolor}
+\iftalk@dark \darktheme \else \lighttheme \fi
+
+% ---- Beamer colours & fonts ----
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{background canvas}{bg=talkbg}
+\setbeamercolor{normal text}{fg=talkfg, bg=talkbg}
+\setbeamercolor{structure}{fg=talkaccent}
+\setbeamercolor{frametitle}{fg=talkfg}   % accent is reserved for takeaways and emphasis
+\setbeamercolor{item}{fg=talkdim}         % bullets and list numbers
+\setbeamercolor{title}{fg=talkaccent}
+\setbeamercolor{subtitle}{fg=talkfg}
+\setbeamercolor{section title}{fg=talkfg}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamercolor{framesubtitle}{fg=talkdim}
+\setbeamerfont{framesubtitle}{size=\small, series=\mdseries}
+\setbeamerfont{title}{series=\bfseries, size=\Huge}
+\setbeamerfont{subtitle}{size=\Large}
+\setbeamerfont{section title}{series=\bfseries, size=\huge}
+
+% ---- Title slide ----
+% Faded code shown behind the title (the opening example)
+\newcommand{\talk@titlecode}{%
+    \makebox[1.6em][r]{1}~~def~simple\_computation(data):\\
+    \makebox[1.6em][r]{2}~~~~~~import~numpy~as~np\\
+    \makebox[1.6em][r]{3}~~~~~~import~matplotlib.pyplot~as~plt\\
+    \makebox[1.6em][r]{4}~~~~~~f~=~open("C:/Users/john/Desktop/params.txt")\\
+    \makebox[1.6em][r]{5}~~~~~~params~=~f.read().split(",")\\
+    \makebox[1.6em][r]{6}~~~~~~a~=~float(params[0])\\
+    \makebox[1.6em][r]{7}~~~~~~b~=~float(params[1])\\
+    \makebox[1.6em][r]{8}~~~~~~\#~b~=~0.5\\
+    \makebox[1.6em][r]{9}~~~~~~result~=~[]\\
+    \makebox[1.6em][r]{10}~~~~~~for~i~in~range(len(data)):\\
+    \makebox[1.6em][r]{11}~~~~~~~~~~if~data[i][3]~>~0:\\
+    \makebox[1.6em][r]{12}~~~~~~~~~~~~~~x~=~data[i][3]~*~0.0259\\
+    \makebox[1.6em][r]{13}~~~~~~~~~~~~~~if~x~>~a:\\
+    \makebox[1.6em][r]{14}~~~~~~~~~~~~~~~~~~if~x~<~b:\\
+    \makebox[1.6em][r]{15}~~~~~~~~~~~~~~~~~~~~~~result.append(x)\\
+    \makebox[1.6em][r]{16}~~~~~~~~~~~~~~~~~~else:\\
+    \makebox[1.6em][r]{17}~~~~~~~~~~~~~~~~~~~~~~result.append(b)\\
+    \makebox[1.6em][r]{18}~~~~~~~~~~~~~~else:\\
+    \makebox[1.6em][r]{\ldots}}
+
+% Accent bar on the left, faded code on the right, title block on the left
+\setbeamertemplate{title page}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[talkaccent] (current page.north west) rectangle ([xshift=5pt]current page.south west);
+    \node[anchor=north east, align=left, font=\tiny\ttfamily, text=talkdim, opacity=0.35]
+      at ([xshift=-0.6cm, yshift=-0.8cm]current page.north east) {\talk@titlecode};
+  \end{tikzpicture}%
+  \vfill
+  \begin{minipage}{0.55\textwidth}
+    {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}
+    \vspace{0.6em}
+    {\usebeamerfont{subtitle}\color{talkfg}\insertsubtitle\par}
+    \vspace{1.4em}
+    {\color{talkaccent}\rule{3cm}{2pt}\par}
+    \vspace{1.4em}
+    {\color{talkdim}\insertauthor\par\vspace{0.2em}\small\insertdate\par}
+  \end{minipage}
+  \vfill}
+
+% ---- Timeline (top): sections + progress bar ----
+% Past sections: filled grey dot; current: accent dot; coming: hollow dot.
+% Short titles (\section[short]{long}) are shown.
+\setbeamertemplate{section in head/foot}{%
+  \hspace{0.8em}\tikz[baseline=-0.6ex]\fill[talkaccent] (0,0) circle (2.6pt);%
+  \,\textcolor{talkaccent}{\textbf{\insertsectionhead}}\hspace{0.8em}}
+\setbeamertemplate{section in head/foot shaded}{%
+  \hspace{0.8em}%
+  \ifnum\insertsectionheadnumber<\c@section\relax
+    \tikz[baseline=-0.6ex]\fill[talkdim] (0,0) circle (2.2pt);%
+  \else
+    \tikz[baseline=-0.6ex]\draw[talkdim] (0,0) circle (2.2pt);%
+  \fi
+  \,\textcolor{talkdim}{\insertsectionhead}\hspace{0.8em}}
+
+\newcommand\talk@progressbar{%
+  \hbox{\begin{tikzpicture}
+    \useasboundingbox (0,0) rectangle (\paperwidth,2pt);
+    \fill[talkdim!35!talkbg] (0,0) rectangle (\paperwidth,2pt);
+    \ifnum\inserttotalframenumber>1
+      \pgfmathsetmacro\talk@ratio{(\insertframenumber-1)/(\inserttotalframenumber-1)}%
+      \fill[talkaccent] (0,0) rectangle (\talk@ratio\paperwidth,2pt);
+    \fi
+  \end{tikzpicture}}}
+
+\setbeamertemplate{headline}{%
+  \vskip5pt
+  {\scriptsize\insertsectionnavigationhorizontal{\paperwidth}{\hfill}{\hfill}}%
+  \vskip4pt
+  \talk@progressbar}
+
+% ---- Bibliography ----
+\setbeamertemplate{bibliography item}{}
+\setbeamercolor{bibliography entry author}{fg=talkfg}
+\setbeamercolor{bibliography entry title}{fg=talkfg}
+\setbeamercolor{bibliography entry location}{fg=talkdim}
+\setbeamercolor{bibliography entry note}{fg=talkdim}
+
+% ---- Slide sources: \source{key} or \source{key1,key2} anywhere in a frame ----
+% Shown in the footer as: Full Name (year), Title
+\DeclareCiteCommand{\talk@sourcecite}
+  {}
+  {\printnames[given-family]{author}\addspace
+   \mkbibparens{\printfield{year}}\addcomma\space
+   \printfield[citetitle]{title}}
+  {\addsemicolon\space}
+  {}
+\def\talk@srcframe{-1}
+\newcommand{\source}[1]{%
+  \nocite{#1}%
+  \xdef\talk@srcframe{\the\c@framenumber}%
+  \gdef\talk@src{\talk@sourcecite{#1}}}
+\newcommand{\talk@printsource}{%
+  \ifnum\c@framenumber=\talk@srcframe\relax\talk@src\fi}
+
+% ---- Footer: slide source on the left, frame number on the right ----
+\setbeamertemplate{footline}{%
+  \hspace{1.5em}%
+  \parbox[b]{0.8\paperwidth}{\raggedright\tiny\color{talkdim}\talk@printsource}%
+  \hfill\textcolor{talkdim}{\scriptsize\insertframenumber/\inserttotalframenumber}\hspace{1.5em}\vspace{1em}}
+
+% ---- Section divider ----
+% Use \sectionquestion{...} just before \section to add a guiding question
+\def\talk@question{}
+\newcommand{\sectionquestion}[1]{\gdef\talk@question{#1}}
+\setbeamertemplate{section page}{%
+  \centering
+  {\usebeamerfont{section title}\usebeamercolor[fg]{section title}\insertsection\par}
+  \vspace{0.9em}
+  {\color{talkaccent}\rule{2.5cm}{2pt}\par}
+  \vspace{0.9em}
+  {\large\color{talkdim}\talk@question\par}}
+\AtBeginSection[]{\begin{frame}\sectionpage\end{frame}\gdef\talk@question{}}
+
+% ---- Code (minted / Pygments) ----
+% Per block: [linenos], [highlightlines={2,4-5}]
+\setminted{
+  fontsize=\footnotesize,
+  highlightcolor=codehl,
+  autogobble, breaklines, tabsize=4,
+}
+
+% Rounded frame around every code block
+\newtcolorbox{codewindow}{colback=codebg, colframe=talkdim!40!codebg,
+  boxrule=0.6pt, arc=3pt, boxsep=1pt, left=1.5pt, right=1.5pt, top=0.5pt, bottom=0.5pt,
+  before skip=2pt, after skip=2pt}
+\let\talk@inputminted\inputminted
+\renewcommand{\inputminted}[3][]{%
+  \begin{codewindow}\talk@inputminted[#1]{#2}{#3}\end{codewindow}}
+
+% ---- Diagram styles ----
+\tikzset{
+  box/.style={draw=talkblue, fill=codebg, text=talkfg, rounded corners=2pt,
+              minimum width=2.8cm, minimum height=0.8cm, font=\small\ttfamily},
+  iface/.style={box, dashed},
+  use/.style={-{Stealth}, draw=talkfg},
+  impl/.style={-{Triangle[open]}, dashed, draw=talkfg},
+}
+
+% ---- PlantUML diagrams (TikZ export) ----
+% \diagram{diagrams/x.tex} or \diagram[0.6]{...}: shrink to fit, max height as fraction of \textheight
+% \color{talkbg}: the TikZ export leaves the C/I/A/E circle letters uncoloured
+\newcommand{\diagram}[2][0.8]{%
+  \begin{adjustbox}{max width=\linewidth, max totalheight=#1\textheight, center}%
+    \color{talkbg}\fontfamily{phv}\footnotesize\selectfont\input{#2}%  % smaller than PlantUML measured, so text fits its boxes
+  \end{adjustbox}}
+
+% ---- Folded code (fake editor fold) ----
+% Inside a frame: \foldlines{start}{length} before a minted block; mark the fold with |\fold|
+% Lines after `start` are renumbered as if `length` lines were collapsed there
+\newcommand{\foldlines}[2]{%
+  \setminted{linenos, escapeinside=||}%
+  \renewcommand\theFancyVerbLine{\textcolor{talkdim}{\ttfamily\scriptsize%
+    \ifnum\value{FancyVerbLine}>#1 \the\numexpr\value{FancyVerbLine}+#2-1\relax
+    \else\arabic{FancyVerbLine}\fi}}}
+\newcommand{\fold}{\colorbox{codehl}{\textcolor{talkdim}{\,\ldots\,}}}
+
+% ---- Content running off the slide ----
+% Fade the bottom 2 cm and add a label
+% Use in a [t] frame: \cutoff{2\,650 more lines}
+\newcommand{\cutoff}[1]{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \foreach \i in {0,...,19}{%
+      \fill[talkbg, opacity=\i/19]
+        ([yshift={(20-\i)*1mm}]current page.south west) rectangle
+        ([yshift={(19-\i)*1mm}]current page.south east);}
+    \node[text=talkdim] at ([yshift=6mm]current page.south) {$\vdots$\quad #1};
+  \end{tikzpicture}}
+
+% ---- Before / after labels ----
+\newcommand{\talk@badge}[2]{\tikz[baseline=(b.base)]\node[fill=#1, text=talkbg,
+  rounded corners=6pt, font=\scriptsize\bfseries, inner xsep=6pt, inner ysep=3pt] (b) {#2};}
+\newcommand{\beforelabel}{\talk@badge{talkbad}{$\times$ Before}}
+\newcommand{\afterlabel}{\talk@badge{talkgood}{\checkmark\ After}}
+
+% ---- Emphasis ----
+% Large figure with a caption, for case-study slides: \bigstat{8.5 M}{machines down}
+\newcommand{\bigstat}[2]{%
+  {\centering{\Huge\bfseries\textcolor{talkbad}{#1}}\par
+   \vspace{0.2em}{\small #2}\par}}
+
+% Main takeaway line under a slide
+\newcommand{\takeaway}[1]{\vfill{\centering\textcolor{talkaccent}{\textbf{#1}}\par}\vfill}
+
+\endinput

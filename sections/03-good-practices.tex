@@ -1,0 +1,126 @@
+\sectionquestion{What should I always do?}
+\section[Good practices]{Basic good practices}
+
+\begin{frame}[fragile]{Small functions}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted{python}{code/good_practices/small_functions_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted{python}{code/good_practices/small_functions_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{A function should fit on your screen and do one thing.}
+    \begin{center}
+    Remember the 2672-line function?
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{No magic numbers}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted{python}{code/good_practices/no_magic_numbers_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted{python}{code/good_practices/no_magic_numbers_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{Name every number that has a meaning.}
+    \begin{center}
+    Defined once, explained once, changed once.
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Don't Repeat Yourself}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted{python}{code/good_practices/dont_repeat_yourself_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted{python}{code/good_practices/dont_repeat_yourself_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{Write it once: a formula copied three times gets fixed twice.}
+
+    \pause
+
+    \begin{center}
+    Did you spot the bug on the left?
+    \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Don't hide errors}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \beforelabel
+        \inputminted[highlightlines={5,6}]{python}{code/good_practices/hidden_errors_before.py}
+
+        \pause
+        \column{0.48\textwidth}
+        \afterlabel
+        \inputminted[highlightlines={5,6}]{python}{code/good_practices/hidden_errors_after.py}
+    \end{columns}
+
+    \vfill
+
+    \takeaway{Catch the error you expect. Let your code crash!}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Good small habits}
+
+    \setbeamertemplate{itemize item}{%
+        \tikz[baseline=-0.6ex]{
+            \draw[talkgood, thick, rounded corners=1.5pt] (-0.17,-0.17) rectangle (0.17,0.17);
+            \draw[talkgood, very thick] (-0.1,0) -- (-0.02,-0.09) -- (0.12,0.1);}}
+
+    \vfill
+
+    \centering
+    \begin{minipage}{0.78\textwidth}
+        \begin{itemize}
+            \setlength{\itemsep}{1.1em}
+            \item<1-> {\large\textbf{Keep it simple (KISS)}}\\
+                {\small\textcolor{talkdim}{Clear beats clever: a smart one-liner costs the next reader ten minutes}}
+            \item<2-> {\large\textbf{You aren't gonna need it (YAGNI)}}\\
+                {\small\textcolor{talkdim}{No options or classes ``just in case''}}
+            \item<3-> {\large\textbf{Unit tests}}\\
+                {\small\textcolor{talkdim}{A few tests let you change code without fear}}
+            \item<4-> {\large\textbf{Make every run reproducible}}\\
+                {\small\textcolor{talkdim}{Fixed seeds (}\mintinline{python}{np.random.default_rng(42)}\textcolor{talkdim}{), git, recorded library versions}}
+        \end{itemize}
+    \end{minipage}
+
+    \vfill
+
+\end{frame}

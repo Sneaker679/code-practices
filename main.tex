@@ -1,0 +1,31 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ---- Bibliography ----
+% Cite on a slide with \source{key}; the full list is on the References slide
+\usepackage[backend=bibtex, style=authoryear, giveninits=false]{biblatex}
+\addbibresource{references.bib}
+
+% ---- Theme ----
+\usetheme[dark]{talk}   % dark or light
+\graphicspath{{images/}}
+
+% ---- Title ----
+\title{Who Wrote This?! (It Was Me)}
+\subtitle{Practices and principles for code that lasts}
+\author{Benjamin Gauthier}
+\date{November 26, 2026}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\input{sections/01-bad-practices.tex}
+\input{sections/02-complexity.tex}
+\input{sections/03-good-practices.tex}
+\input{sections/04-refresher.tex}
+\input{sections/05-design-principles.tex}
+\input{sections/06-wrap-up.tex}
+
+\end{document}

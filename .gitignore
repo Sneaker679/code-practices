@@ -1,0 +1,12 @@
+# LaTeX build output
+.DS_Store
+aux/
+diagrams/aux/
+_minted*/
+*.pdf
+*.synctex.gz
+
+# Local tool files
+.claude/
+
+images/meme.png

